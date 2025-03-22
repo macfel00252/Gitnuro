@@ -67,6 +67,7 @@ val settings = listOf(
     SettingsEntry.Entry(Res.drawable.folder, Res.string.settings_entry_environment) { Environment(it) },
     SettingsEntry.Entry(Res.drawable.branch, Res.string.settings_entry_branches) { Branches(it) },
     SettingsEntry.Entry(Res.drawable.cloud, Res.string.settings_entry_remote_actions) { RemoteActions(it) },
+    SettingsEntry.Entry(Res.drawable.message, Res.string.settings_entry_commit_message) { IncludeBranchNameInCommitMessage(it) },
 
     SettingsEntry.Section(Res.string.settings_section_network),
     SettingsEntry.Entry(Res.drawable.network, Res.string.settings_entry_proxy) { Proxy(it) },
@@ -422,6 +423,20 @@ private fun Branches(settingsViewModel: SettingsViewModel) {
         value = mergeAutoStash,
         onValueChanged = { value ->
             settingsViewModel.mergeAutoStash = value
+        }
+    )
+}
+
+@Composable
+private fun IncludeBranchNameInCommitMessage(settingsViewModel: SettingsViewModel) {
+    val includeBranchName by settingsViewModel.includeBranchNameFlow.collectAsState()
+
+    SettingToggle(
+        title = "Include branch name in commit message",
+        subtitle = "Include branch name in commit message",
+        value = includeBranchName,
+        onValueChanged = { value ->
+            settingsViewModel.includeBranchName = value
         }
     )
 }

@@ -176,6 +176,7 @@
     <string name="settings_entry_environment">Environment</string>
     <string name="settings_entry_branches">Branches</string>
     <string name="settings_entry_remote_actions">Remote actions</string>
+    <string name="settings_entry_commit_message">Commit message</string>
     <string name="settings_section_network">Network</string>
     <string name="settings_entry_proxy">Proxy</string>
     <string name="settings_entry_auth">Authentication</string>
