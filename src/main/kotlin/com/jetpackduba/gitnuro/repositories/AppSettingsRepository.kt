@@ -54,7 +54,6 @@ private const val PREF_FIRST_PANE_WIDTH = "firstPaneWidth"
 private const val PREF_THIRD_PANE_WIDTH = "thirdPaneWidth"
 
 private const val PREF_GIT_FF_MERGE = "gitFFMerge"
-private const val PREF_GIT_MERGE_AUTOSTASH = "mergeAutoStash"
 private const val PREF_GIT_PULL_REBASE = "gitPullRebase"
 private const val PREF_GIT_PUSH_WITH_LEASE = "gitPushWithLease"
 
@@ -95,6 +94,9 @@ class AppSettingsRepository @Inject constructor() {
 
     private val _mergeAutoStashFlow = MutableStateFlow(mergeAutoStash)
     val mergeAutoStashFlow = _mergeAutoStashFlow.asStateFlow()
+
+    private val _includeBranchNameFlow = MutableStateFlow(includeBranchName)
+    val includeBranchNameFlow = _includeBranchNameFlow.asStateFlow()
 
     private val _pullRebaseFlow = MutableStateFlow(pullRebase)
     val pullRebaseFlow = _pullRebaseFlow.asStateFlow()
@@ -256,6 +258,18 @@ class AppSettingsRepository @Inject constructor() {
         set(value) {
             preferences.putBoolean(PREF_GIT_FF_MERGE, value)
             _ffMergeFlow.value = value
+        }
+
+    /**
+     * Property that decides if branch name should be automatically appended to commit message
+     */
+    var includeBranchName: Boolean
+        get() {
+            return preferences.getBoolean(PREF_GIT_INCLUDE_BRANCH_NAME, false)
+        }
+        set(value) {
+            preferences.putBoolean(PREF_GIT_INCLUDE_BRANCH_NAME, value)
+            _includeBranchNameFlow.value = value
         }
 
     /**
