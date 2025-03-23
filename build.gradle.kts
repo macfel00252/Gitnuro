@@ -121,11 +121,11 @@ tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilation
     }
 }
 
-tasks.withType<JavaExec> {
-    javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(javaLanguageVersion)
-    })
-}
+//tasks.withType<JavaExec> {
+//    javaLauncher.set(javaToolchains.launcherFor {
+//        languageVersion.set(javaLanguageVersion)
+//    })
+//}
 
 
 compose.desktop {
@@ -183,6 +183,32 @@ task("fatJarLinux", type = Jar::class) {
         )
     }
     with(tasks.jar.get() as CopySpec)
+}
+
+task("fatJarWindows", type = Jar::class) {
+    val archSuffix = "x86_64"
+
+    archiveBaseName.set("$projectName-windows-$archSuffix")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Implementation-Title"] = name
+        attributes["Implementation-Version"] = projectVersion
+        attributes["Main-Class"] = "com.jetpackduba.gitnuro.MainKt"
+    }
+    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) }) {
+        exclude(
+            "META-INF/MANIFEST.MF",
+            "META-INF/*.SF",
+            "META-INF/*.DSA",
+            "META-INF/*.RSA",
+        )
+    }
+    with(tasks.jar.get() as CopySpec)
+
+    doLast {
+        println("Fat JAR for Windows created successfully!")
+    }
 }
 
 task("rust_build") {
