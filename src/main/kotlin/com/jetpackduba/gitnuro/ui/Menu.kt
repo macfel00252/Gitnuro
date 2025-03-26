@@ -4,11 +4,13 @@ package com.jetpackduba.gitnuro.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -17,11 +19,13 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import org.jetbrains.compose.resources.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
@@ -29,8 +33,13 @@ import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
+import com.jetpackduba.gitnuro.extensions.handOnHover
 import com.jetpackduba.gitnuro.extensions.ignoreKeyEvents
 import com.jetpackduba.gitnuro.generated.resources.*
+import com.jetpackduba.gitnuro.generated.resources.Res
+import com.jetpackduba.gitnuro.generated.resources.menu_open
+import com.jetpackduba.gitnuro.generated.resources.menu_open_tooltip
+import com.jetpackduba.gitnuro.generated.resources.menu_pull_rebase
 import com.jetpackduba.gitnuro.git.remote_operations.PullType
 import com.jetpackduba.gitnuro.keybindings.Keybinding
 import com.jetpackduba.gitnuro.keybindings.KeybindingOption
@@ -42,6 +51,7 @@ import com.jetpackduba.gitnuro.ui.components.tooltip.InstantTooltip
 import com.jetpackduba.gitnuro.ui.context_menu.*
 import com.jetpackduba.gitnuro.viewmodels.MenuViewModel
 import org.jetbrains.compose.resources.painterResource
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.stringResource
 
 // TODO Add tooltips to all the buttons
@@ -59,6 +69,7 @@ fun Menu(
     onShowOpenPopupChange: (Boolean) -> Unit,
 ) {
     val isPullWithRebaseDefault by menuViewModel.isPullWithRebaseDefault.collectAsState()
+    val fetchAllInterval by menuViewModel.fetchAllInterval.collectAsState()
     val lastLoadedTabs by menuViewModel.lastLoadedTabs.collectAsState()
     val (position, setPosition) = remember { mutableStateOf<LayoutCoordinates?>(null) }
 
@@ -87,6 +98,14 @@ fun Menu(
             stringResource(Res.string.menu_pull_default)
         }
 
+        FetchAllButton(
+            interval = fetchAllInterval
+        ) { background ->
+            if (background)
+                menuViewModel.fetchAllInBackground();
+            else
+                menuViewModel.fetchAll()
+        }
 
         ExtendedMenuButton(
             modifier = Modifier.padding(end = 4.dp),
@@ -256,6 +275,25 @@ fun Menu(
             }
         }
     }
+}
+
+@Composable
+fun FetchAllButton(interval: Int, onRefresh: (background: Boolean) -> Unit) {
+    val intervalMs = interval * 1000L
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(intervalMs)
+            onRefresh(true)
+        }
+    }
+    MenuButton(
+        modifier = Modifier
+            .padding(start = 16.dp),
+        title = "Fetch all ",
+        icon = painterResource(Res.drawable.refresh),
+        keybinding = null,
+        tooltip = "Fetch all every $interval sec",
+        onClick = { onRefresh(false) })
 }
 
 @Composable
