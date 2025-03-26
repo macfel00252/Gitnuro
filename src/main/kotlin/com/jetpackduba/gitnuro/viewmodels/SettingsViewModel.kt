@@ -41,6 +41,7 @@ class SettingsViewModel @Inject constructor(
     val mergeAutoStashFlow = appSettingsRepository.mergeAutoStashFlow
     val pullRebaseFlow = appSettingsRepository.pullRebaseFlow
     val pushWithLeaseFlow = appSettingsRepository.pushWithLeaseFlow
+    val fetchAllIntervalFlow = appSettingsRepository.fetchAllIntervalFlow
     val swapUncommittedChangesFlow = appSettingsRepository.swapUncommittedChangesFlow
     val cacheCredentialsInMemoryFlow = appSettingsRepository.cacheCredentialsInMemoryFlow
     val verifySslFlow = appSettingsRepository.verifySslFlow
@@ -107,6 +108,12 @@ class SettingsViewModel @Inject constructor(
         get() = appSettingsRepository.pushWithLease
         set(value) {
             appSettingsRepository.pushWithLease = value
+        }
+
+    var fetchAllInterval: Int
+        get() = appSettingsRepository.fetchAllInterval
+        set(value) {
+            appSettingsRepository.fetchAllInterval = value
         }
 
     var theme: Theme
