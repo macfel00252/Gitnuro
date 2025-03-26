@@ -19,6 +19,7 @@ import javax.inject.Inject
 interface IGlobalMenuActionsViewModel {
     fun pull(pullType: PullType): Job
     fun fetchAll(): Job
+    fun fetchAllInBackground(): Job
     fun push(force: Boolean = false, pushTags: Boolean = false): Job
     fun stash(): Job
     fun popStash(): Job
@@ -55,6 +56,15 @@ class GlobalMenuActionsViewModel @Inject constructor(
         isCancellable = false,
         refreshEvenIfCrashes = true,
         taskType = TaskType.FETCH,
+    ) { git ->
+        fetchAllRemotesUseCase(git)
+
+        positiveNotification("Fetch all completed")
+    }
+
+    override fun fetchAllInBackground() = tabState.runOperation(
+        refreshType = RefreshType.ALL_DATA,
+        refreshEvenIfCrashes = true,
     ) { git ->
         fetchAllRemotesUseCase(git)
 

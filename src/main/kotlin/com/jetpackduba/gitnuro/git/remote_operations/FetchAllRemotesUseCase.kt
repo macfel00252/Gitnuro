@@ -38,7 +38,10 @@ class FetchAllRemotesUseCase @Inject constructor(
 
                             override fun endTask() {}
 
-                            override fun isCancelled(): Boolean = isActive
+                            override fun isCancelled(): Boolean {
+                                //return isActive; // TODO: when delegating to isActive then "Missing unknown COMMITHASH" is thrown. Why?
+                                return false;
+                            }
 
                             override fun showDuration(enabled: Boolean) {}
                         })
