@@ -48,6 +48,7 @@ private const val PREF_GIT_FF_MERGE = "gitFFMerge"
 private const val PREF_GIT_INCLUDE_BRANCH_NAME = "gitIncludeBranchName"
 private const val PREF_GIT_PULL_REBASE = "gitPullRebase"
 private const val PREF_GIT_PUSH_WITH_LEASE = "gitPushWithLease"
+private const val PREF_GIT_FETCH_ALL_INTERVAL = "gitFetchAllInterval"
 
 private const val PREF_VERIFY_SSL = "verifySsl"
 
@@ -92,6 +93,9 @@ class AppSettingsRepository @Inject constructor() {
 
     private val _pushWithLeaseFlow = MutableStateFlow(pushWithLease)
     val pushWithLeaseFlow: StateFlow<Boolean> = _pushWithLeaseFlow.asStateFlow()
+
+    private val _fetchAllIntervalFlow = MutableStateFlow(fetchAllInterval)
+    val fetchAllIntervalFlow: StateFlow<Int> = _fetchAllIntervalFlow.asStateFlow()
 
     private val _customThemeFlow = MutableStateFlow<ColorsScheme?>(null)
     val customThemeFlow = _customThemeFlow.asStateFlow()
@@ -275,7 +279,14 @@ class AppSettingsRepository @Inject constructor() {
             preferences.putBoolean(PREF_GIT_PUSH_WITH_LEASE, value)
             _pushWithLeaseFlow.value = value
         }
-
+    var fetchAllInterval: Int
+        get() {
+            return preferences.getInt(PREF_GIT_FETCH_ALL_INTERVAL, 300)
+        }
+        set(value) {
+            preferences.putInt(PREF_GIT_FETCH_ALL_INTERVAL, value)
+            _fetchAllIntervalFlow.value = value
+        }
     var windowPlacement: WindowsPlacementPreference
         get() {
             val placement = preferences.getInt(PREF_WINDOW_PLACEMENT, defaultWindowPlacement.value)

@@ -11,5 +11,6 @@ class MenuViewModel @Inject constructor(
 ): IGlobalMenuActionsViewModel by globalMenuActionsViewModel {
     val isPullWithRebaseDefault = settings.pullRebaseFlow
     val lastLoadedTabs = appStateManager.latestOpenedRepositoriesPaths
+    val fetchAllInterval = settings.fetchAllIntervalFlow;
 
 }

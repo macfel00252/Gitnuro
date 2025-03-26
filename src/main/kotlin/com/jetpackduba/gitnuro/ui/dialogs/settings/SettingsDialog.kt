@@ -297,6 +297,7 @@ private fun Section(name: String) {
 private fun RemoteActions(settingsViewModel: SettingsViewModel) {
     val pullRebase by settingsViewModel.pullRebaseFlow.collectAsState()
     val pushWithLease by settingsViewModel.pushWithLeaseFlow.collectAsState()
+    val fetchAllInterval by settingsViewModel.fetchAllIntervalFlow.collectAsState()
 
     SettingToggle(
         title = "Pull with rebase as default",
@@ -313,6 +314,14 @@ private fun RemoteActions(settingsViewModel: SettingsViewModel) {
         value = pushWithLease,
         onValueChanged = { value ->
             settingsViewModel.pushWithLease = value
+        }
+    )
+    SettingIntInput(
+        title = "Fetch All interval",
+        subtitle = "Value in seconds",
+        value = fetchAllInterval,
+        onValueChanged = { value ->
+            settingsViewModel.fetchAllInterval = value
         }
     )
 }
