@@ -34,7 +34,7 @@ import org.eclipse.jgit.lib.RepositoryState
 import java.io.File
 import javax.inject.Inject
 
-private const val MIN_TIME_IN_MS_TO_SHOW_LOAD = 500L
+private const val MIN_TIME_IN_MS_TO_SHOW_LOAD = 1000L
 
 class StatusViewModel @Inject constructor(
     private val tabState: TabState,
