@@ -13,41 +13,51 @@ import javax.inject.Inject
 class GetIgnoreRulesUseCase @Inject constructor() {
     suspend operator fun invoke(repository: Repository): List<FastIgnoreRule> = withContext(Dispatchers.IO) {
         val ignoreLines = mutableListOf<String>()
+        ignoreLines += readExcludeFile(File(repository.directory, ".git/info/exclude"))
+        ignoreLines += collectGitignoreRules(repository.workTree)
+        ignoreLines += readGlobalExcludes(repository)
+        val ignoreRules = ignoreLines.map { FastIgnoreRule(it) }
+        return@withContext ignoreRules
+    }
 
-        val repositoryExcludeFile = File(repository.directory, ".git/info/exclude")
-        val ignoreFile = File(repository.workTree, ".gitignore")
+    private fun readExcludeFile(file: File): List<String> {
+        return if (file.exists() && file.isFile) file.readLines() else emptyList()
+    }
 
+    private fun collectGitignoreRules(root: File): List<String> {
+        val result = mutableListOf<String>()
+        root.walkTopDown()
+            .filter { it.name == ".gitignore" && it.isFile }
+            .forEach { file ->
+                val relativeDir = file.parentFile.relativeTo(root).invariantSeparatorsPath
+                val prefix = if (relativeDir.isNotEmpty()) "$relativeDir/" else ""
+                val lines = file.readLines().map { line ->
+                    val trimmed = line.trim()
+                    when {
+                        trimmed.isEmpty() || trimmed.startsWith("#") -> trimmed
+                        trimmed.startsWith("!") -> {
+                            val pattern = trimmed.removePrefix("!")
+                            "!$prefix$pattern"
+                        }
+
+                        else -> "$prefix$trimmed"
+                    }
+                }
+                result += lines
+            }
+        return result
+    }
+
+    private fun readGlobalExcludes(repository: Repository): List<String> {
         repository.config.load()
         val baseConfig: Config? = repository.config.baseConfig
 
-        if (repositoryExcludeFile.exists() && repositoryExcludeFile.isFile) {
-            ignoreLines.addAll(repositoryExcludeFile.readLines())
-        }
+        val excludesFilePath = baseConfig?.getString("core", null, "excludesFile") ?: return emptyList()
+        val expandedPath = if (excludesFilePath.startsWith("~")) {
+            excludesFilePath.replace("~", System.getProperty("user.home").orEmpty())
+        } else excludesFilePath
+        val excludesFile = FileSystems.getDefault().getPath(expandedPath).normalize().toFile();
 
-        if (ignoreFile.exists() && ignoreFile.isFile) {
-            ignoreLines.addAll(ignoreFile.readLines())
-        }
-
-        if (baseConfig != null) {
-            var excludesFilePath = baseConfig.getString("core", null, "excludesFile") ?: ""
-
-            if (excludesFilePath.isNotEmpty()) {
-                if (excludesFilePath.startsWith("~")) {
-                    excludesFilePath = excludesFilePath.replace("~", System.getProperty("user.home").orEmpty())
-                }
-
-                val excludesFile = FileSystems
-                    .getDefault()
-                    .getPath(excludesFilePath)
-                    .normalize()
-                    .toFile()
-
-                if (excludesFile.exists() && excludesFile.isFile) {
-                    ignoreLines.addAll(excludesFile.readLines())
-                }
-            }
-        }
-
-        ignoreLines.map { FastIgnoreRule(it) }
+        return readExcludeFile(excludesFile)
     }
 }
