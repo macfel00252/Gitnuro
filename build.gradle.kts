@@ -121,12 +121,6 @@ tasks.named("compileKotlin", org.jetbrains.kotlin.gradle.tasks.KotlinCompilation
     }
 }
 
-tasks.withType<JavaExec> {
-    javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(javaLanguageVersion)
-    })
-}
-
 
 compose.desktop {
     application {
