@@ -37,7 +37,7 @@ import javax.inject.Inject
 import kotlin.math.max
 import kotlin.math.min
 
-private const val MIN_TIME_IN_MS_TO_SHOW_LOAD = 500L
+private const val MIN_TIME_IN_MS_TO_SHOW_LOAD = 1000L
 
 class StatusPaneViewModel @Inject constructor(
     private val tabState: TabState,
