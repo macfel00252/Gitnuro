@@ -1,5 +1,6 @@
 package com.jetpackduba.gitnuro.viewmodels
 
+import androidx.compose.runtime.Composable
 import com.jetpackduba.gitnuro.TaskType
 import com.jetpackduba.gitnuro.extensions.simpleName
 import com.jetpackduba.gitnuro.git.RefreshType
@@ -69,6 +70,8 @@ class SharedBranchesViewModel @Inject constructor(
         subtitle = "Checking out branch ${ref.simpleName}",
         taskType = TaskType.CHECKOUT_BRANCH,
     ) { git ->
+
+
         checkoutRefUseCase(git, ref)
 
         positiveNotification("\"${ref.simpleName}\" checked out")

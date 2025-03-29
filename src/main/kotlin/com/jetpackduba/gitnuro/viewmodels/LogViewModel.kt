@@ -102,9 +102,7 @@ class LogViewModel @Inject constructor(
 
     private val _focusCommit = MutableSharedFlow<RevCommit>()
     val focusCommit: Flow<RevCommit> = merge(_focusCommit, scrollToItem)
-
-    private val _logDialog = MutableStateFlow<LogDialog>(LogDialog.None)
-    val logDialog: StateFlow<LogDialog> = _logDialog
+    val logDialog: StateFlow<LogDialog> = tabState.logDialog;
 
     val verticalListState = MutableStateFlow(LazyListState(0, 0))
     val horizontalListState = MutableStateFlow(ScrollState(0))
@@ -386,7 +384,7 @@ class LogViewModel @Inject constructor(
     }
 
     fun showDialog(dialog: LogDialog) {
-        _logDialog.value = dialog
+        tabState.showDialog(dialog)
     }
 
     fun closeSearch() {

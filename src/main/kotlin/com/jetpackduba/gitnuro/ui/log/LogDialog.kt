@@ -9,4 +9,5 @@ sealed interface LogDialog {
     data class NewTag(val graphNode: GraphNode) : LogDialog
     data class ResetBranch(val graphNode: GraphNode) : LogDialog
     data class ChangeDefaultBranch(val ref: Ref) : LogDialog
+    data class CheckoutAndResetToRemoteBranch(val ref: Ref, val hasLocalChanges:Boolean) : LogDialog
 }

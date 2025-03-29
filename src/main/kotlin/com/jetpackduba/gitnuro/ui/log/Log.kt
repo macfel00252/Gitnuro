@@ -55,10 +55,7 @@ import com.jetpackduba.gitnuro.ui.components.TooltipText
 import com.jetpackduba.gitnuro.ui.components.tooltip.InstantTooltip
 import com.jetpackduba.gitnuro.ui.components.tooltip.InstantTooltipPosition
 import com.jetpackduba.gitnuro.ui.context_menu.*
-import com.jetpackduba.gitnuro.ui.dialogs.NewBranchDialog
-import com.jetpackduba.gitnuro.ui.dialogs.NewTagDialog
-import com.jetpackduba.gitnuro.ui.dialogs.ResetBranchDialog
-import com.jetpackduba.gitnuro.ui.dialogs.SetDefaultUpstreamBranchDialog
+import com.jetpackduba.gitnuro.ui.dialogs.*
 import com.jetpackduba.gitnuro.ui.resizePointerIconEast
 import com.jetpackduba.gitnuro.viewmodels.*
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -635,6 +632,19 @@ fun LogDialogs(
                 viewModel = changeUpstreamBranchDialogViewModel(),
                 branch = showLogDialog.ref,
                 onClose = { onResetShowLogDialog() },
+            )
+        }
+
+        is LogDialog.CheckoutAndResetToRemoteBranch -> {
+            CheckoutAndResetToRemoteBranch(
+                branch = showLogDialog.ref,
+                onClose = {
+                    onResetShowLogDialog()
+                },
+                onAccept = { branch ->
+                    logViewModel.checkoutAndResetToRemoteBranch(branch, showLogDialog.hasLocalChanges)
+                    onResetShowLogDialog()
+                }
             )
         }
     }

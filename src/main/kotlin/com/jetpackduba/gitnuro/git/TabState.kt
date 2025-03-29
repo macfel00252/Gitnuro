@@ -10,6 +10,7 @@ import com.jetpackduba.gitnuro.managers.ErrorsManager
 import com.jetpackduba.gitnuro.managers.newErrorNow
 import com.jetpackduba.gitnuro.models.Notification
 import com.jetpackduba.gitnuro.ui.SelectedItem
+import com.jetpackduba.gitnuro.ui.log.LogDialog
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.sync.Mutex
@@ -61,6 +62,9 @@ class TabState @Inject constructor(
 
     private val _closeView = MutableSharedFlow<CloseableView>()
     val closeViewFlow = _closeView.asSharedFlow()
+
+    private val _logDialog = MutableStateFlow<LogDialog>(LogDialog.None)
+    val logDialog: StateFlow<LogDialog> = _logDialog
 
     /**
      * Property that indicates if a git operation is running
@@ -333,6 +337,10 @@ class TabState @Inject constructor(
 
     fun cancelCurrentTask() {
         currentJob?.cancel()
+    }
+
+    fun showDialog(dialog: LogDialog) {
+        _logDialog.value = dialog
     }
 }
 
