@@ -53,7 +53,10 @@ private const val PREF_CACHE_CREDENTIALS_IN_MEMORY = "credentialsInMemory"
 private const val PREF_FIRST_PANE_WIDTH = "firstPaneWidth"
 private const val PREF_THIRD_PANE_WIDTH = "thirdPaneWidth"
 
+
+private const val PREF_GIT_INCLUDE_BRANCH_NAME = "gitIncludeBranchName"
 private const val PREF_GIT_FF_MERGE = "gitFFMerge"
+private const val PREF_GIT_MERGE_AUTOSTASH = "mergeAutoStash"
 private const val PREF_GIT_PULL_REBASE = "gitPullRebase"
 private const val PREF_GIT_PUSH_WITH_LEASE = "gitPushWithLease"
 private const val PREF_GIT_FETCH_ALL_INTERVAL = "gitFetchAllInterval"
