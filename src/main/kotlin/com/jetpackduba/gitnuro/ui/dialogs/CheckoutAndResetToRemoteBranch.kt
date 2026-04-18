@@ -24,6 +24,7 @@ import com.jetpackduba.gitnuro.keybindings.KeybindingOption
 import com.jetpackduba.gitnuro.keybindings.matchesBinding
 import com.jetpackduba.gitnuro.ui.components.AdjustableOutlinedTextField
 import com.jetpackduba.gitnuro.ui.components.PrimaryButton
+import com.jetpackduba.gitnuro.ui.dialogs.base.MaterialDialog
 import org.eclipse.jgit.lib.Ref
 
 @Composable

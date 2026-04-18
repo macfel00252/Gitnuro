@@ -6,6 +6,7 @@ import com.jetpackduba.gitnuro.git.author.LoadAuthorUseCase
 import com.jetpackduba.gitnuro.git.config.LoadSignOffConfigUseCase
 import com.jetpackduba.gitnuro.git.config.LocalConfigConstants
 import com.jetpackduba.gitnuro.git.repository.GetRepositoryStateUseCase
+import com.jetpackduba.gitnuro.git.signers.AppGpgSigner
 import com.jetpackduba.gitnuro.logging.printLog
 import com.jetpackduba.gitnuro.repositories.AppSettingsRepository
 import com.jetpackduba.gitnuro.utils.use
