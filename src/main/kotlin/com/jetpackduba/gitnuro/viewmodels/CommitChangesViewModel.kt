@@ -18,7 +18,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.eclipse.jgit.diff.DiffEntry
+import org.eclipse.jgit.lib.Constants
+import org.eclipse.jgit.lib.MutableObjectId
 import org.eclipse.jgit.revwalk.RevCommit
+import org.eclipse.jgit.treewalk.TreeWalk
+import org.eclipse.jgit.treewalk.filter.PathFilter
 import java.io.File
 import javax.inject.Inject
 
@@ -169,6 +173,29 @@ class CommitChangesViewModel @Inject constructor(
         if (folderPath != null) {
             val file = File(git.repository.workTree.absolutePath + File.separator + folderPath)
             file.openFileInFolder()
+        }
+    }
+
+    fun revertFile(filePath: String, commit: RevCommit) = tabState.runOperation(
+        refreshType = RefreshType.UNCOMMITTED_CHANGES_AND_LOG,
+    ) { git ->
+        val repository = git.repository
+        val file = File(repository.workTree, filePath)
+
+        TreeWalk(repository).use { treeWalk ->
+            treeWalk.isRecursive = true
+            treeWalk.addTree(commit.tree)
+            treeWalk.filter = PathFilter.create(filePath)
+
+            if (treeWalk.next()) {
+                val id = MutableObjectId()
+                treeWalk.getObjectId(id, 0)
+                val blob = repository.open(id)
+                val bytes = blob.bytes
+
+                file.parentFile?.mkdirs()
+                file.writeBytes(bytes)
+            }
         }
     }
 

@@ -44,6 +44,7 @@ fun CommitChanges(
     selectedItem: SelectedItem.CommitBasedItem,
     onBlame: (String) -> Unit,
     onHistory: (String) -> Unit,
+    onRevert: (String, RevCommit) -> Unit,
 ) {
     val tabFocusRequester = LocalTabFocusRequester.current
     val diffSelected by commitChangesViewModel.diffSelected.collectAsState(null)
@@ -82,6 +83,7 @@ fun CommitChanges(
                 onBlame = onBlame,
                 onHistory = onHistory,
                 onOpenFileInFolder = { commitChangesViewModel.openFileInFolder(it) },
+                onRevert = { filePath, commit -> onRevert(filePath, commit) },
                 showSearch = showSearch,
                 showAsTree = showAsTree,
                 changesListScroll = changesListScroll,
@@ -119,6 +121,7 @@ private fun CommitChangesView(
     onBlame: (String) -> Unit,
     onHistory: (String) -> Unit,
     onOpenFileInFolder: (String) -> Unit,
+    onRevert: (String, RevCommit) -> Unit,
     onDiffSelected: (DiffEntry) -> Unit,
     onSearchFilterToggled: (Boolean) -> Unit,
     onSearchFocused: () -> Unit,
@@ -168,6 +171,7 @@ private fun CommitChangesView(
                                 onBlame = { onBlame(diffEntry.filePath) },
                                 onHistory = { onHistory(diffEntry.filePath) },
                                 onOpenFileInFolder = { onOpenFileInFolder(diffEntry.parentDirectoryPath) },
+                                onRevert = { onRevert(diffEntry.filePath, commitChangesStatus.commit) },
                             )
                         }
                     )
@@ -185,6 +189,7 @@ private fun CommitChangesView(
                                 onBlame = { onBlame(diffEntry.filePath) },
                                 onHistory = { onHistory(diffEntry.filePath) },
                                 onOpenFileInFolder = { onOpenFileInFolder(diffEntry.parentDirectoryPath) },
+                                onRevert = { onRevert(diffEntry.filePath, commitChangesStatus.commit) },
                             )
                         },
                         onDirectoryClicked = onDirectoryClicked,

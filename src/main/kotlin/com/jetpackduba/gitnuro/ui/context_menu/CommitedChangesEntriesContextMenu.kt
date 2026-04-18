@@ -10,6 +10,7 @@ fun committedChangesEntriesContextMenuItems(
     onBlame: () -> Unit,
     onHistory: () -> Unit,
     onOpenFileInFolder: () -> Unit,
+    onRevert: () -> Unit,
 ): List<ContextMenuElement> {
     return mutableListOf<ContextMenuElement>().apply {
         if (diffEntry.changeType != DiffEntry.ChangeType.ADD ||
@@ -24,6 +25,12 @@ fun committedChangesEntriesContextMenuItems(
                 composableLabel = { stringResource(Res.string.committed_changes_context_menu_file_history) },
                 icon = { painterResource(Res.drawable.history) },
                 onClick = onHistory,
+            )
+
+            addContextMenu(
+                composableLabel = { stringResource(Res.string.committed_changes_context_menu_revert_changes) },
+                icon = { painterResource(Res.drawable.undo) },
+                onClick = onRevert,
             )
 
             addContextMenu(

@@ -392,6 +392,9 @@ fun MainContentView(
                             selectedItem = selectedItem,
                             onBlame = { repositoryOpenViewModel.blameFile(it) },
                             onHistory = { repositoryOpenViewModel.fileHistory(it) },
+                            onRevert = { filePath, commit ->
+                                repositoryOpenViewModel.tabViewModelsProvider.commitChangesViewModel.revertFile(filePath, commit)
+                            },
                         )
                     }
 

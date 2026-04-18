@@ -117,6 +117,7 @@
     <string name="committed_changes_context_menu_blame_file">Blame file</string>
     <string name="committed_changes_context_menu_file_history">File history</string>
     <string name="committed_changes_context_menu_open_file_in_folder">Open file in folder</string>
+    <string name="committed_changes_context_menu_revert_changes">Revert changes</string>
 
     <!-- Log context menu -->
     <string name="log_context_menu_checkout_commit">Checkout commit</string>
