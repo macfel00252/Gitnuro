@@ -101,6 +101,10 @@
     <string name="status_entries_context_menu_copy_files_absolute_paths">Copy paths</string>
     <string name="status_entries_context_menu_copy_files_relative_paths">Copy relative paths</string>
 
+    <!-- Branch exists dialog -->
+    <string name="branch_exists_dialog_title">Branch already exists</string>
+    <string name="branch_exists_dialog_message">Branch '%1$s' already exists. Would you like to checkout?</string>
+
     <!-- Branch context menu -->
     <string name="branch_context_menu_checkout_branch">Checkout branch</string>
     <string name="branch_context_menu_merge_branch">Merge branch</string>

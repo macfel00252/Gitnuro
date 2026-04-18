@@ -66,6 +66,7 @@ import org.eclipse.jgit.lib.RepositoryState
 import org.eclipse.jgit.revwalk.RevCommit
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 private val colors = listOf(
     Color(0xFF42a5f5),
@@ -202,6 +203,22 @@ private fun LogLoaded(
         setUpstreamBranchDialogViewModel = { viewModelsProvider.setUpstreamBranchDialogViewModel },
         renameBranchDialogViewModel = { viewModelsProvider.renameBranchDialogViewModel },
     )
+
+    val branchToRebase by logViewModel.branchToRebase.collectAsState()
+    if (branchToRebase != null) {
+        BranchExistsDialog(
+            icon = painterResource(Res.drawable.branch),
+            title = stringResource(Res.string.branch_exists_dialog_title),
+            branchName = branchToRebase!!,
+            onDismiss = { logViewModel.dismissBranchToRebase() },
+            onCheckout = {
+                viewModelsProvider.repositoryOpenViewModel.checkoutBranchByName(branchToRebase!!)
+            },
+            onRebase = {
+                viewModelsProvider.repositoryOpenViewModel.rebaseBranchByName(branchToRebase!!)
+            },
+        )
+    }
 
     Column(
         modifier = Modifier

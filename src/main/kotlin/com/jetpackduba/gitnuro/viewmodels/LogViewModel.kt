@@ -3,6 +3,7 @@ package com.jetpackduba.gitnuro.viewmodels
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.lazy.LazyListState
 import com.jetpackduba.gitnuro.TaskType
+import com.jetpackduba.gitnuro.exceptions.BranchAlreadyExistsException
 import com.jetpackduba.gitnuro.extensions.delayedStateChange
 import com.jetpackduba.gitnuro.extensions.shortName
 import com.jetpackduba.gitnuro.git.CloseableView
@@ -79,6 +80,9 @@ class LogViewModel @Inject constructor(
     ISharedRemotesViewModel by sharedRemotesViewModel,
     ISharedTagsViewModel by sharedTagsViewModel {
     private val _logStatus = MutableStateFlow<LogStatus>(LogStatus.Loading)
+
+    private val _branchToRebase = MutableStateFlow<String?>(null)
+    val branchToRebase: StateFlow<String?> = _branchToRebase
 
     val logStatus: StateFlow<LogStatus>
         get() = _logStatus
@@ -223,10 +227,22 @@ class LogViewModel @Inject constructor(
         subtitle = "Creating new branch \"$branch\" on commit ${revCommit.shortName}",
         refreshEvenIfCrashesInteractive = { it is CheckoutConflictException },
         taskType = TaskType.CREATE_BRANCH,
+        handleError = { ex ->
+            if (ex is BranchAlreadyExistsException) {
+                _branchToRebase.value = ex.branchName
+                true
+            } else {
+                false
+            }
+        },
     ) { git ->
         createBranchOnCommitUseCase(git, branch, revCommit)
 
         positiveNotification("Branch \"$branch\" created")
+    }
+
+    fun dismissBranchToRebase() {
+        _branchToRebase.value = null
     }
 
     fun createTagOnCommit(tag: String, revCommit: RevCommit) = tabState.safeProcessing(

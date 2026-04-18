@@ -93,11 +93,13 @@ class TabState @Inject constructor(
         isCancellable: Boolean = false,
         refreshEvenIfCrashes: Boolean = false,
         refreshEvenIfCrashesInteractive: ((Exception) -> Boolean)? = null,
+        handleError: ((Exception) -> Boolean)? = null,
         callback: suspend (git: Git) -> Notification?,
     ): Job {
         val job = scope.launch(Dispatchers.IO) {
             var hasProcessFailed = false
             var refreshEvenIfCrashesInteractiveResult = false
+            var handledByCallback = false
             operationRunning = true
 
 
@@ -131,7 +133,11 @@ class TabState @Inject constructor(
                 if (!containsCancellation) {
                     val innerException = getInnerException(ex)
 
-                    errorsManager.addError(newErrorNow(taskType, innerException))
+                    handledByCallback = handleError?.invoke(innerException) ?: false
+
+                    if (!handledByCallback) {
+                        errorsManager.addError(newErrorNow(taskType, innerException))
+                    }
                 }
 
                 printError(TAG, ex.message.orEmpty(), ex)
@@ -140,7 +146,7 @@ class TabState @Inject constructor(
                 operationRunning = false
                 lastOperation = System.currentTimeMillis()
 
-                if (refreshType != RefreshType.NONE && (!hasProcessFailed || refreshEvenIfCrashes || refreshEvenIfCrashesInteractiveResult)) {
+                if (refreshType != RefreshType.NONE && (!hasProcessFailed || refreshEvenIfCrashes || refreshEvenIfCrashesInteractiveResult || handledByCallback)) {
                     refreshData.emit(refreshType)
                 }
             }

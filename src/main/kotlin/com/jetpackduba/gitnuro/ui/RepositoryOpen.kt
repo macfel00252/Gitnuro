@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.jetpackduba.gitnuro.LocalTabFocusRequester
 import com.jetpackduba.gitnuro.extensions.handMouseClickable
 import com.jetpackduba.gitnuro.generated.resources.Res
+import com.jetpackduba.gitnuro.generated.resources.branch
+import com.jetpackduba.gitnuro.generated.resources.branch_exists_dialog_title
 import com.jetpackduba.gitnuro.generated.resources.bottom_info_bar_email_not_set
 import com.jetpackduba.gitnuro.generated.resources.bottom_info_bar_name_and_email
 import com.jetpackduba.gitnuro.generated.resources.bottom_info_bar_name_not_set
@@ -37,6 +39,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.eclipse.jgit.lib.RepositoryState
 import org.eclipse.jgit.revwalk.RevCommit
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -55,6 +58,18 @@ fun RepositoryOpenPage(
     var showStashWithMessageDialog by remember { mutableStateOf(false) }
     var showQuickActionsDialog by remember { mutableStateOf(false) }
     var showSignOffDialog by remember { mutableStateOf(false) }
+
+    val branchToRebase by repositoryOpenViewModel.branchToRebase.collectAsState()
+    if (branchToRebase != null) {
+        BranchExistsDialog(
+            icon = painterResource(Res.drawable.branch),
+            title = stringResource(Res.string.branch_exists_dialog_title),
+            branchName = branchToRebase!!,
+            onDismiss = { repositoryOpenViewModel.dismissBranchToRebase() },
+            onCheckout = { repositoryOpenViewModel.checkoutBranchByName(branchToRebase!!) },
+            onRebase = { repositoryOpenViewModel.rebaseBranchByName(branchToRebase!!) },
+        )
+    }
 
     if (showNewBranchDialog) {
         NewBranchDialog(

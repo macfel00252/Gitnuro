@@ -2,9 +2,11 @@ package com.jetpackduba.gitnuro.viewmodels
 
 import com.jetpackduba.gitnuro.SharedRepositoryStateManager
 import com.jetpackduba.gitnuro.TaskType
+import com.jetpackduba.gitnuro.exceptions.BranchAlreadyExistsException
 import com.jetpackduba.gitnuro.exceptions.codeToMessage
 import com.jetpackduba.gitnuro.git.*
 import com.jetpackduba.gitnuro.git.branches.CreateBranchUseCase
+import com.jetpackduba.gitnuro.git.rebase.RebaseBranchOntoCurrentUseCase
 import com.jetpackduba.gitnuro.git.rebase.RebaseInteractiveState
 import com.jetpackduba.gitnuro.git.stash.StashChangesUseCase
 import com.jetpackduba.gitnuro.git.workspace.StageUntrackedFileUseCase
@@ -35,6 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.api.RebaseResult
 import org.eclipse.jgit.api.errors.CheckoutConflictException
 import org.eclipse.jgit.blame.BlameResult
 import org.eclipse.jgit.lib.RepositoryState
@@ -62,6 +65,7 @@ class RepositoryOpenViewModel @Inject constructor(
     private val fileChangesWatcher: FileChangesWatcher,
     private val getAuthorInfoUseCase: GetAuthorInfoUseCase,
     private val createBranchUseCase: CreateBranchUseCase,
+    private val rebaseBranchOntoCurrentUseCase: RebaseBranchOntoCurrentUseCase,
     private val stashChangesUseCase: StashChangesUseCase,
     private val stageUntrackedFileUseCase: StageUntrackedFileUseCase,
     private val openFilePickerUseCase: OpenFilePickerUseCase,
@@ -77,6 +81,9 @@ class RepositoryOpenViewModel @Inject constructor(
 ) : IVerticalSplitPaneConfig by verticalSplitPaneConfig,
     IGlobalMenuActionsViewModel by globalMenuActionsViewModel {
     private val errorsManager: ErrorsManager = tabState.errorsManager
+
+    private val _branchToRebase = MutableStateFlow<String?>(null)
+    val branchToRebase: StateFlow<String?> = _branchToRebase
 
     val selectedItem: StateFlow<SelectedItem> = tabState.selectedItem
 
@@ -312,10 +319,48 @@ class RepositoryOpenViewModel @Inject constructor(
         refreshType = RefreshType.ALL_DATA,
         refreshEvenIfCrashesInteractive = { it is CheckoutConflictException },
         taskType = TaskType.CREATE_BRANCH,
+        handleError = { ex ->
+            if (ex is BranchAlreadyExistsException) {
+                _branchToRebase.value = ex.branchName
+                true
+            } else {
+                false
+            }
+        },
     ) { git ->
         createBranchUseCase(git, branchName)
 
         positiveNotification("Branch \"${branchName}\" created")
+    }
+
+    fun checkoutBranchByName(branchName: String) = tabState.safeProcessing(
+        refreshType = RefreshType.ALL_DATA,
+        taskType = TaskType.CHECKOUT_BRANCH,
+    ) { git ->
+        git.checkout()
+            .setName(branchName)
+            .setCreateBranch(false)
+            .call()
+
+        _branchToRebase.value = null
+        positiveNotification("Branch \"$branchName\" checked out")
+    }
+
+    fun rebaseBranchByName(branchName: String) = tabState.safeProcessing(
+        refreshType = RefreshType.ALL_DATA,
+        taskType = TaskType.REBASE_BRANCH,
+    ) { git ->
+        val status = rebaseBranchOntoCurrentUseCase(git, branchName)
+        if (status != RebaseResult.Status.OK && status != RebaseResult.Status.UP_TO_DATE) {
+            throw RuntimeException("Rebase failed with status: $status")
+        }
+
+        _branchToRebase.value = null
+        positiveNotification("Branch \"$branchName\" rebased onto current")
+    }
+
+    fun dismissBranchToRebase() {
+        _branchToRebase.value = null
     }
 
     fun stashWithMessage(message: String) = tabState.safeProcessing(
