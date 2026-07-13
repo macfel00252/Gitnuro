@@ -4,13 +4,15 @@ import com.jetpackduba.gitnuro.SettingsDefaults
 
 enum class AvatarProviderType(val value: Int) {
     NONE(0),
-    GRAVATAR(1);
+    GRAVATAR(1),
+    JIRA(2);
 
     companion object {
         fun getFromValue(value: Int): AvatarProviderType {
             return when (value) {
                 NONE.value -> NONE
                 GRAVATAR.value -> GRAVATAR
+                JIRA.value -> JIRA
                 else -> SettingsDefaults.defaultAvatarProviderType
             }
         }

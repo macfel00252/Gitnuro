@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.jetpackduba.gitnuro.avatarproviders.JiraAvatarProvider
 import com.jetpackduba.gitnuro.avatarproviders.GravatarAvatarProvider
 import com.jetpackduba.gitnuro.avatarproviders.NoneAvatarProvider
 import com.jetpackduba.gitnuro.di.DaggerAppComponent
@@ -175,6 +176,7 @@ class App {
                     val avatarProvider = when (avatarProviderType) {
                         AvatarProviderType.NONE -> NoneAvatarProvider()
                         AvatarProviderType.GRAVATAR -> GravatarAvatarProvider()
+                        AvatarProviderType.JIRA -> JiraAvatarProvider()
                     }
 
                     compositionValues.add(LocalAvatarProvider provides avatarProvider)
