@@ -641,6 +641,7 @@ private fun Appearance(settingsViewModel: SettingsViewModel) {
         dropDownOptions = listOf(
             DropDownOption(AvatarProviderType.NONE, "None"),
             DropDownOption(AvatarProviderType.GRAVATAR, "Gravatar"),
+            DropDownOption(AvatarProviderType.JIRA, "Jira"),
         ),
         onOptionSelected = {
             settingsViewModel.avatarProvider = it.value
